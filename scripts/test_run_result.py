@@ -22,8 +22,8 @@ def test_substantive_output_is_saved(tmp_path):
     completed, report = run(tmp_path, status=0, mode="work", output="Review completed")
     assert completed.returncode == 0
     assert "Outcome: work produced" in report
+    assert "produced non-empty output" in report
     assert "Review completed" not in report
-    assert "not retained" in report
 
 
 def test_successful_no_code_change_can_have_a_result(tmp_path):

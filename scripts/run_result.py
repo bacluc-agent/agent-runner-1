@@ -11,7 +11,8 @@ def main() -> int:
         mode = "invalid"
     succeeded = status == 0 and (mode == "smoke" or bool(output))
     outcome = "valid no-op/smoke" if succeeded and mode == "smoke" else "work produced" if succeeded else "failure"
-    report = f"# Agent run result\n\nOutcome: {outcome}\n\nCoordinator exit status: {status}\n\nCoordinator output is not retained because it may contain tool output or credentials.\n"
+    result_summary = "Coordinator produced non-empty output." if output else "Coordinator produced no output."
+    report = f"# Agent run result\n\nOutcome: {outcome}\n\nCoordinator exit status: {status}\n\n{result_summary} Content is omitted because output may contain tool output or credentials.\n"
     destination.write_text(report)
     return 0 if succeeded else 1
 
