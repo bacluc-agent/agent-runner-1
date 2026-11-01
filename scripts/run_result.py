@@ -20,9 +20,11 @@ def main() -> int:
             events = []
         final_message_id = next(
             (
-                event.get("part", {}).get("messageID")
+                event["part"].get("messageID")
                 for event in reversed(events)
-                if event.get("type") == "step_finish" and event.get("part", {}).get("reason") == "stop"
+                if event.get("type") == "step_finish"
+                and isinstance(event.get("part"), dict)
+                and event["part"].get("reason") == "stop"
             ),
             None,
         )
@@ -30,8 +32,9 @@ def main() -> int:
             event["part"]["text"]
             for event in events
             if event.get("type") == "text"
-            and event.get("part", {}).get("messageID") == final_message_id
-            and isinstance(event.get("part", {}).get("text"), str)
+            and isinstance(event.get("part"), dict)
+            and event["part"].get("messageID") == final_message_id
+            and isinstance(event["part"].get("text"), str)
         ).strip()
     if mode not in {"work", "smoke"}:
         status = status or 1

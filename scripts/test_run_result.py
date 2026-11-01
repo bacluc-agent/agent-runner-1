@@ -69,6 +69,20 @@ def test_non_object_json_event_fails_with_report(tmp_path):
     assert "Outcome: failure" in report
 
 
+def test_malformed_event_parts_fail_with_report(tmp_path):
+    completed, report = run(
+        tmp_path,
+        status=0,
+        mode="work",
+        output=events(
+            {"type": "step_finish", "part": None},
+            {"type": "text", "part": None},
+        ),
+    )
+    assert completed.returncode != 0
+    assert "Outcome: failure" in report
+
+
 def test_process_failure_is_not_success(tmp_path):
     completed, report = run(
         tmp_path,
