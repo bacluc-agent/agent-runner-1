@@ -5,10 +5,11 @@ from pathlib import Path
 SCRIPT = Path(__file__).with_name("run_result.py")
 
 
-def run(tmp_path, *, status, mode, output):
+def run(tmp_path, *, status, mode, output=None):
     source = tmp_path / "coordinator.out"
     result = tmp_path / "run-result.md"
-    source.write_text(output)
+    if output is not None:
+        source.write_text(output)
     completed = subprocess.run(
         [sys.executable, str(SCRIPT), str(source), str(result), str(status), mode],
         capture_output=True,
@@ -21,7 +22,8 @@ def test_substantive_output_is_saved(tmp_path):
     completed, report = run(tmp_path, status=0, mode="work", output="Review completed")
     assert completed.returncode == 0
     assert "Outcome: work produced" in report
-    assert "Review completed" in report
+    assert "Review completed" not in report
+    assert "not retained" in report
 
 
 def test_successful_no_code_change_can_have_a_result(tmp_path):
@@ -44,5 +46,17 @@ def test_missing_substantive_result_fails(tmp_path):
 
 def test_process_failure_is_not_success(tmp_path):
     completed, report = run(tmp_path, status=1, mode="work", output="partial")
+    assert completed.returncode != 0
+    assert "Outcome: failure" in report
+
+
+def test_missing_source_file_fails(tmp_path):
+    completed, report = run(tmp_path, status=0, mode="work")
+    assert completed.returncode != 0
+    assert "Outcome: failure" in report
+
+
+def test_invalid_run_mode_fails(tmp_path):
+    completed, report = run(tmp_path, status=0, mode="workk", output="result")
     assert completed.returncode != 0
     assert "Outcome: failure" in report
