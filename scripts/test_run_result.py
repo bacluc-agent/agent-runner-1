@@ -63,6 +63,12 @@ def test_missing_substantive_result_fails(tmp_path):
     assert "Outcome: failure" in report
 
 
+def test_non_object_json_event_fails_with_report(tmp_path):
+    completed, report = run(tmp_path, status=0, mode="work", output="[]")
+    assert completed.returncode != 0
+    assert "Outcome: failure" in report
+
+
 def test_process_failure_is_not_success(tmp_path):
     completed, report = run(
         tmp_path,

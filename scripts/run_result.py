@@ -9,7 +9,13 @@ def main() -> int:
     output = ""
     if source.exists():
         try:
-            events = [json.loads(line) for line in source.read_text().splitlines() if line.strip()]
+            events = [
+                event
+                for line in source.read_text().splitlines()
+                if line.strip()
+                for event in [json.loads(line)]
+                if isinstance(event, dict)
+            ]
         except (json.JSONDecodeError, OSError):
             events = []
         final_message_id = next(
