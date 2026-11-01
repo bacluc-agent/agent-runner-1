@@ -494,7 +494,7 @@ jobs:
           printf 'Final coordinator command: opencode run --agent coordinator --model %q --title %q\n' "$MODEL" "$coordinator_session_title"
           printf 'Coordinator prompt:\n%s\n' "$PROMPT"
           set +e
-          timeout "${COORDINATOR_TIMEOUT}m" opencode run --agent coordinator --model "$MODEL" --title "$coordinator_session_title" "$PROMPT" > "$RUNNER_TEMP/coordinator.out" 2>&1
+          timeout "${COORDINATOR_TIMEOUT}m" opencode run --format json --agent coordinator --model "$MODEL" --title "$coordinator_session_title" "$PROMPT" > "$RUNNER_TEMP/coordinator.out" 2>&1
           coordinator_statuses=("${PIPESTATUS[@]}")
           printf '::%s::\n' "$stop_token"
           coordinator_status=${coordinator_statuses[0]}
