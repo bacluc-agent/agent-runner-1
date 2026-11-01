@@ -12,16 +12,19 @@ def main() -> int:
             events = [json.loads(line) for line in source.read_text().splitlines() if line.strip()]
         except (json.JSONDecodeError, OSError):
             events = []
-        final_message_ids = {
-            event.get("part", {}).get("messageID")
-            for event in events
-            if event.get("type") == "step_finish" and event.get("part", {}).get("reason") == "stop"
-        }
+        final_message_id = next(
+            (
+                event.get("part", {}).get("messageID")
+                for event in reversed(events)
+                if event.get("type") == "step_finish" and event.get("part", {}).get("reason") == "stop"
+            ),
+            None,
+        )
         output = "\n".join(
             event["part"]["text"]
             for event in events
             if event.get("type") == "text"
-            and event.get("part", {}).get("messageID") in final_message_ids
+            and event.get("part", {}).get("messageID") == final_message_id
             and isinstance(event.get("part", {}).get("text"), str)
         ).strip()
     if mode not in {"work", "smoke"}:
